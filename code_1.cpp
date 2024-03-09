@@ -18,6 +18,9 @@ const char* mqtt_password = "1212@Ap07";
 const int mqtt_port =8883;
 /** Secure WiFi Connectivity Initialisation ***/
 WiFiClientSecure espClient;
+/**Flame_sensor initialization**/
+int Flame_sensor = D1;
+int Flame_detected;
 
 /** MQTT Client Initialisation Using WiFi Connection ***/
 PubSubClient client(espClient);
@@ -88,7 +91,7 @@ void reconnect() {
     // Attempt to connect
     if (client.connect(clientId.c_str(), mqtt_username, mqtt_password)) {
       Serial.println("connected");
-      client.subscribe("flame_data");   // subscribe the topics here
+      //client.subscribe("flame_data");   // subscribe the topics here
 
     } else {
       Serial.print("failed, rc=");
@@ -100,7 +103,7 @@ void reconnect() {
 }
 /** Call back Method for Receiving MQTT messages and Switching LED ***/
 
-void callback(char* topic, byte* payload, unsigned int length) {
+/*void callback(char* topic, byte* payload, unsigned int length) {
   String incommingMessage = "";
   for (int i = 0; i < length; i++) incommingMessage+=(char)payload[i];
 
@@ -113,7 +116,7 @@ void callback(char* topic, byte* payload, unsigned int length) {
 
   }
 
-}
+}*/
 /** Method for Publishing MQTT Messages ****/
 void publishMessage(const char* topic, String payload , boolean retained){
   if (client.publish(topic, payload.c_str(), true))
@@ -136,17 +139,17 @@ void setup() {
 
   client.setServer(mqtt_server, mqtt_port);
   client.setCallback(callback);
+  pinMode(Flame_sensor, INPUT_PULLUP);
 }
 /*** Main Function ******/
 void loop() {
 
   if (!client.connected()) reconnect(); // check if client is connected
   client.loop();
-  
-
-  //publishMessage("esp8266_data", "mqtt_message", true);
-      client.subscribe("esp8266_data");
-
-
+  Flame_detected = digitalRead(Flame_sensor);
+  if(flame_detected == 0){
+     publishMessage("flame_data", "plant_1", true)
+      }
+ 
   delay(5000);
 }
