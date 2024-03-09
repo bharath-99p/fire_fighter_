@@ -6,12 +6,10 @@
 #include <ArduinoJson.h>
 #include <PubSubClient.h>
 #include <WiFiClientSecure.h>
+
 /** WiFi Connection Details ***/
 const char* ssid = "mm849";
 const char* password = "12345678";
-
-/** LED Settings ***/
-const int led = 5; //Set LED pin as GPIO5
 
 /*** MQTT Broker Connection Details ***/
 const char* mqtt_server = "a77318ae28a342eeba9cfb75dd56927d.s2.eu.hivemq.cloud";
@@ -62,6 +60,7 @@ mRGunUHBcnWEvgJBQl9nJEiU0Zsnvgc/ubhPgXRR4Xq37Z0j4r7g1SgEEzwxA57d
 emyPxgcYxn/eR44/KJ4EBs+lVDR3veyJm+kXQ99b21/+jh5Xos1AnX5iItreGCc=
 -----END CERTIFICATE-----
 )EOF";
+
 /***** Connect to WiFi *****/
 void setup_wifi() {
   delay(10);
@@ -89,8 +88,7 @@ void reconnect() {
     // Attempt to connect
     if (client.connect(clientId.c_str(), mqtt_username, mqtt_password)) {
       Serial.println("connected");
-
-      client.subscribe("led_state");   // subscribe the topics here
+      client.subscribe("flame_data");   // subscribe the topics here
 
     } else {
       Serial.print("failed, rc=");
