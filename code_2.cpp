@@ -13,14 +13,12 @@ SoftwareSerial myserial(D2,D3);
 const char* ssid = "mm849";
 const char* password = "12345678";
 
-/** LED Settings ***/
-const int led = 5; //Set LED pin as GPIO5
-
 /*** MQTT Broker Connection Details ***/
 const char* mqtt_server = "a77318ae28a342eeba9cfb75dd56927d.s2.eu.hivemq.cloud";
 const char* mqtt_username = "maha_002";
 const char* mqtt_password = "1212@Ap07";
 const int mqtt_port =8883;
+
 /** Secure WiFi Connectivity Initialisation ***/
 WiFiClientSecure espClient;
 
@@ -93,7 +91,7 @@ void reconnect() {
     if (client.connect(clientId.c_str(), mqtt_username, mqtt_password)) {
       Serial.println("connected");
 
-      client.subscribe("led_state");   // subscribe the topics here
+      client.subscribe("flame_data");   // subscribe the topics here
 
     } else {
       Serial.print("failed, rc=");
@@ -110,25 +108,24 @@ void callback(char* topic, byte* payload, unsigned int length) {
   for (int i = 0; i < length; i++) incommingMessage+=(char)payload[i];
   Serial.println("Message arrived ["+String(topic)+"]"+incommingMessage);
   if(incommingMessage=="plant_one"){
-    Serial.write("one");
+   myserial.write("one");
   }
   if(incommingMessage=="plant_two"){
-    Serial.write("two");
+    myserial.write("two");
   }
   if(incommingMessage=="plant_three"){
-    Serial.write("three");
+    myserial.write("three");
   }
 }
-/** Method for Publishing MQTT Messages ****/
+/** Method for Publishing MQTT Messages 
 void publishMessage(const char* topic, String payload , boolean retained){
   if (client.publish(topic, payload.c_str(), true))
       Serial.println("Message publised ["+String(topic)+"]: "+payload);
 }
+*/
 /** Application Initialisation Function****/
 void setup() {
-
-  //dht.setup(DHTpin, DHTesp::DHT11); //Set up DHT11 sensor
-  pinMode(led, OUTPUT); //set up LED
+ 
   Serial.begin(115200);
   while (!Serial) delay(1);
   setup_wifi();
