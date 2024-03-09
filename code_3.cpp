@@ -13,7 +13,7 @@
 #define txPin  3
 #include <SoftwareSerial.h>
 // Set up a new SoftwareSerial object
-SoftwareSerial mySerial (rxPin, txPin);
+SoftwareSerial myserial (rxPin, txPin);
 
 int Set=15;
 int distance_L, distance_F, distance_R; 
@@ -34,7 +34,7 @@ analogWrite(enB, 200); // Write The Duty Cycle 0 to 255 Enable Pin B for Motor2 
 pinMode(servo, OUTPUT);
 pinMode(rxPin, INPUT);
 pinMode(txPin, OUTPUT);
- mySerial.begin(9600);
+ myserial.begin(9600);
  for (int angle = 70; angle <= 140; angle += 5)  {
    servoPulse(servo, angle);  }
  for (int angle = 140; angle >= 0; angle -= 5)  {
@@ -48,6 +48,12 @@ void loop(){
 //==============================================
 //     Line Follower and Obstacle Avoiding
 //==============================================  
+char plant_id=;
+if(myserial.available()){
+ plant_id=myserial.read();
+}
+//_______________________to plant one__________________________________________________________________________
+if(plant_id =='1'){ 
 distance_F = Ultrasonic_read();
 Serial.print("D F=");Serial.println(distance_F);
 //if Right Sensor and Left Sensor are at White color then it will call forword function
@@ -60,9 +66,47 @@ Serial.print("D F=");Serial.println(distance_F);
 else if((digitalRead(R_S) == 1)&&(digitalRead(L_S) == 0)){turnRight();}  
 //if Right Sensor is White and Left Sensor is Black then it will call turn Left function
 else if((digitalRead(R_S) == 0)&&(digitalRead(L_S) == 1)){turnLeft();} 
+//IF T joint arises
+else if((digitalRead(R_S) == 1)&&(digitalRead(L_S) == 1)){turnLeft();} 
     
 delay(10);
 }
+//_______________________to plant two__________________________________________________________________________
+if(plant_id =='2'){ 
+distance_F = Ultrasonic_read();
+Serial.print("D F=");Serial.println(distance_F);
+//if Right Sensor and Left Sensor are at White color then it will call forword function
+ if(((digitalRead(R_S) == 0)&&(digitalRead(L_S) == 0))||((digitalRead(R_S) == 1)&&(digitalRead(L_S) == 1))){
+  if(distance_F > Set){forword();}
+                  else{Check_side();}  
+ }  
+ 
+//if Right Sensor is Black and Left Sensor is White then it will call turn Right function
+else if((digitalRead(R_S) == 1)&&(digitalRead(L_S) == 0)){turnRight();}  
+//if Right Sensor is White and Left Sensor is Black then it will call turn Left function
+else if((digitalRead(R_S) == 0)&&(digitalRead(L_S) == 1)){turnLeft();}  
+    
+delay(10);
+}
+//_______________________to plant three__________________________________________________________________________
+if(plant_id =='3'){ 
+distance_F = Ultrasonic_read();
+Serial.print("D F=");Serial.println(distance_F);
+//if Right Sensor and Left Sensor are at White color then it will call forword function
+ if((digitalRead(R_S) == 0)&&(digitalRead(L_S) == 0)){
+  if(distance_F > Set){forword();}
+                  else{Check_side();}  
+ }  
+ 
+//if Right Sensor is Black and Left Sensor is White then it will call turn Right function
+else if((digitalRead(R_S) == 1)&&(digitalRead(L_S) == 0)){turnRight();}  
+//if Right Sensor is White and Left Sensor is Black then it will call turn Left function
+else if((digitalRead(R_S) == 0)&&(digitalRead(L_S) == 1)){turnLeft();} 
+//IF T joint arises
+else if((digitalRead(R_S) == 1)&&(digitalRead(L_S) == 1)){turnRight();} 
+    
+delay(10);
+}}
 void servoPulse (int pin, int angle){
 int pwm = (angle*11) + 500;      // Convert angle to microseconds
  digitalWrite(pin, HIGH);
@@ -155,3 +199,7 @@ digitalWrite(in2, LOW); //Left Motor forword Pin
 digitalWrite(in3, LOW); //Right Motor forword Pin 
 digitalWrite(in4, LOW); //Right Motor backword Pin 
 }
+
+
+
+
