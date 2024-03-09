@@ -48,7 +48,7 @@ void loop(){
 //==============================================
 //     Line Follower and Obstacle Avoiding
 //==============================================  
-char plant_id=;
+char plant_id='';
 if(myserial.available()){
  plant_id=myserial.read();
 }
