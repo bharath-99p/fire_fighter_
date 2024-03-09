@@ -127,6 +127,7 @@ void publishMessage(const char* topic, String payload , boolean retained){
 void setup() {
  
   Serial.begin(115200);
+  mySerial.begin(9600);
   while (!Serial) delay(1);
   setup_wifi();
 
