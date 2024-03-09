@@ -125,8 +125,6 @@ void publishMessage(const char* topic, String payload , boolean retained){
 /** Application Initialisation Function****/
 void setup() {
 
-  //dht.setup(DHTpin, DHTesp::DHT11); //Set up DHT11 sensor
-  pinMode(led, OUTPUT); //set up LED
   Serial.begin(9600);
   while (!Serial) delay(1);
   setup_wifi();
@@ -138,7 +136,7 @@ void setup() {
   #endif
 
   client.setServer(mqtt_server, mqtt_port);
-  client.setCallback(callback);
+  //client.setCallback(callback);
   pinMode(Flame_sensor, INPUT_PULLUP);
 }
 /*** Main Function ******/
@@ -147,8 +145,8 @@ void loop() {
   if (!client.connected()) reconnect(); // check if client is connected
   client.loop();
   Flame_detected = digitalRead(Flame_sensor);
-  if(flame_detected == 0){
-     publishMessage("flame_data", "plant_1", true)
+  if(Flame_detected == 0){
+     publishMessage("flame_data", "plant_1", true);
       }
  
   delay(5000);
