@@ -6,6 +6,9 @@
 #include <ArduinoJson.h>
 #include <PubSubClient.h>
 #include <WiFiClientSecure.h>
+#include "SoftwareSerial.h"
+
+SoftwareSerial myserial(D2,D3);
 /** WiFi Connection Details ***/
 const char* ssid = "mm849";
 const char* password = "12345678";
