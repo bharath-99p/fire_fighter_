@@ -108,13 +108,13 @@ void callback(char* topic, byte* payload, unsigned int length) {
   for (int i = 0; i < length; i++) incommingMessage+=(char)payload[i];
   Serial.println("Message arrived ["+String(topic)+"]"+incommingMessage);
   if(incommingMessage=="plant_one"){
-   myserial.write("one");
+   myserial.write("1");
   }
   if(incommingMessage=="plant_two"){
-    myserial.write("two");
+    myserial.write("2");
   }
   if(incommingMessage=="plant_three"){
-    myserial.write("three");
+    myserial.write("3");
   }
 }
 /** Method for Publishing MQTT Messages 
