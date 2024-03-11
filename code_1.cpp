@@ -1,9 +1,4 @@
-#ifdef ESP8266
- #include <ESP8266WiFi.h>
- #else
- #include <WiFi.h>
-#endif
-#include <ArduinoJson.h>
+#include <WiFi.h>
 #include <PubSubClient.h>
 #include <WiFiClientSecure.h>
 
