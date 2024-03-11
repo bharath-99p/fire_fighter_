@@ -14,7 +14,7 @@ const int mqtt_port =8883;
 /** Secure WiFi Connectivity Initialisation ***/
 WiFiClientSecure espClient;
 /**Flame_sensor initialization**/
-int Flame_sensor = D1;
+int Flame_sensor = 13;
 int Flame_detected;
 
 /** MQTT Client Initialisation Using WiFi Connection ***/
@@ -143,6 +143,6 @@ void loop() {
   if(Flame_detected == 0){
      publishMessage("flame_data", "plant_1", true);
       }
- 
+
   delay(5000);
 }
