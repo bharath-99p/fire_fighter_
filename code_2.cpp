@@ -6,9 +6,9 @@
 #include <ArduinoJson.h>
 #include <PubSubClient.h>
 #include <WiFiClientSecure.h>
-#include "SoftwareSerial.h"
+//#include "SoftwareSerial.h"
 
-SoftwareSerial myserial(D2,D3);
+//SoftwareSerial myserial(D2,D3);
 /** WiFi Connection Details ***/
 const char* ssid = "mm849";
 const char* password = "12345678";
@@ -66,37 +66,33 @@ emyPxgcYxn/eR44/KJ4EBs+lVDR3veyJm+kXQ99b21/+jh5Xos1AnX5iItreGCc=
 /***** Connect to WiFi *****/
 void setup_wifi() {
   delay(10);
-  Serial.print("\nConnecting to ");
-  Serial.println(ssid);
+
 
   WiFi.mode(WIFI_STA);
   WiFi.begin(ssid, password);
 
   while (WiFi.status() != WL_CONNECTED) {
     delay(500);
-    Serial.print(".");
+    
   }
   randomSeed(micros());
-  Serial.println("\nWiFi connected\nIP address: ");
-  Serial.println(WiFi.localIP());
+  
 }
 /***** Connect to MQTT Broker *****/
 void reconnect() {
   // Loop until we're reconnected
   while (!client.connected()) {
-    Serial.print("Attempting MQTT connection...");
+   
     String clientId = "ESP8266Client-";   // Create a random client ID
     clientId += String(random(0xffff), HEX);
     // Attempt to connect
     if (client.connect(clientId.c_str(), mqtt_username, mqtt_password)) {
-      Serial.println("connected");
+    
 
       client.subscribe("flame_data");   // subscribe the topics here
 
     } else {
-      Serial.print("failed, rc=");
-      Serial.print(client.state());
-      Serial.println(" try again in 5 seconds");   // Wait 5 seconds before retrying
+         // Wait 5 seconds before retrying
       delay(5000);
     }
   }
@@ -106,15 +102,9 @@ void reconnect() {
 void callback(char* topic, byte* payload, unsigned int length) {
   String incommingMessage = "";
   for (int i = 0; i < length; i++) incommingMessage+=(char)payload[i];
-  Serial.println("Message arrived ["+String(topic)+"]"+incommingMessage);
-  if(incommingMessage=="plant_one"){
-   myserial.write("1");
-  }
-  if(incommingMessage=="plant_two"){
-    myserial.write("2");
-  }
-  if(incommingMessage=="plant_three"){
-    myserial.write("3");
+  
+  if(incommingMessage=="plant_1"){
+   Serial.write(1);
   }
 }
 /** Method for Publishing MQTT Messages 
@@ -126,8 +116,8 @@ void publishMessage(const char* topic, String payload , boolean retained){
 /** Application Initialisation Function****/
 void setup() {
  
-  Serial.begin(115200);
-  mySerial.begin(9600);
+  Serial.begin(9600);
+  //mySerial.begin(9600);
   while (!Serial) delay(1);
   setup_wifi();
 
