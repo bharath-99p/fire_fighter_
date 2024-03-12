@@ -105,6 +105,7 @@ void reconnect() {
 void callback(char* topic, byte* payload, unsigned int length) {
   String incommingMessage = "";
   for (int i = 0; i < length; i++) incommingMessage+=(char)payload[i];
+ Serial.println(incommingMessage);
   
   if(incommingMessage=="plant_1"){
    Serial2.write("A");
