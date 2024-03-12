@@ -15,7 +15,7 @@
 #include <Servo.h>
 // Set up a new SoftwareSerial object
 SoftwareSerial myserial (rxPin, txPin);
-myservo.attach(9)
+myservo.attach(11);
 
 int Set=15;
 int distance_L, distance_F, distance_R; 
