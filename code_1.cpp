@@ -22,7 +22,7 @@ const int mqtt_port =8883;
 WiFiClientSecure espClient;
 /**Flame_sensor initialization**/
 int Flame_sensor = D0;
-int Flame_detected;
+int Flame_detected =1;
 int buzzer = D2;
 int smokeA0 = A0;
 int sensorThres = 600;
@@ -147,6 +147,7 @@ void setup() {
   pinMode(Flame_sensor, INPUT_PULLUP);
  pinMode(buzzer, OUTPUT);
  pinMode(smokeA0, INPUT);
+ pinMode(led,OUTPUT);
 }
 /*** Main Function ******/
 void loop() {
