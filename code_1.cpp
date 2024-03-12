@@ -21,11 +21,12 @@ const int mqtt_port =8883;
 /** Secure WiFi Connectivity Initialisation ***/
 WiFiClientSecure espClient;
 /**Flame_sensor initialization**/
-int Flame_sensor = 13;
+int Flame_sensor = D0;
 int Flame_detected;
 int buzzer = D2;
 int smokeA0 = A0;
 int sensorThres = 600;
+int led=D1
 
 
 /** MQTT Client Initialisation Using WiFi Connection ***/
@@ -153,23 +154,19 @@ void loop() {
   if (!client.connected()) reconnect(); // check if client is connected
   client.loop();
   Flame_detected = digitalRead(Flame_sensor);
+  int analogSensor = analogRead(smokeA0);
   if(Flame_detected == 0){
      publishMessage("flame_data", "plant_1", true);
-      }
-
-  delay(5000);
- int analogSensor = analogRead(smokeA0);
-
- Serial.print("Pin A0: ");
- Serial.println(analogSensor);
- // Checks if it has reached the threshold value
- if (analogSensor > sensorThres)
- {
-   tone(buzzer, 1000, 200);
- }
+     tone(buzzer, 1000, 200);
+     if (analogSensor > sensorThres){
+      digitalWrite(led,HIGH);
+     }
+    delay(200000000);
+  }
  else
  {
    noTone(buzzer);
+   digitalWrite(led,LOW);
  }
- delay(100);
+ delay(5000);
 }
