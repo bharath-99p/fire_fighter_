@@ -6,6 +6,9 @@
 #include <ArduinoJson.h>
 #include <PubSubClient.h>
 #include <WiFiClientSecure.h>
+#include <WiFi.h>
+#include <PubSubClient.h>
+#include <WiFiClientSecure.h>
 //#include "SoftwareSerial.h"
 
 //SoftwareSerial myserial(D2,D3);
