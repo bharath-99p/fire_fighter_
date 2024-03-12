@@ -9,11 +9,13 @@
 #define echo A2    //Echo pin
 #define trigger A3 //Trigger pin
 #define servo A5
-#define rxPin  2
-#define txPin  3
+#define rxPin  12
+#define txPin  13
 #include <SoftwareSerial.h>
+#include <Servo.h>
 // Set up a new SoftwareSerial object
 SoftwareSerial myserial (rxPin, txPin);
+myservo.attach(9)
 
 int Set=15;
 int distance_L, distance_F, distance_R; 
@@ -34,14 +36,11 @@ analogWrite(enB, 200); // Write The Duty Cycle 0 to 255 Enable Pin B for Motor2 
 pinMode(servo, OUTPUT);
 pinMode(rxPin, INPUT);
 pinMode(txPin, OUTPUT);
- myserial.begin(9600);
- for (int angle = 70; angle <= 140; angle += 5)  {
-   servoPulse(servo, angle);  }
- for (int angle = 140; angle >= 0; angle -= 5)  {
-   servoPulse(servo, angle);  }
- for (int angle = 0; angle <= 70; angle += 5)  {
-   servoPulse(servo, angle);  }
+myserial.begin(9600);
+myservo.write(90);
+delay(100);
 distance_F = Ultrasonic_read();
+Serial.println(distance_F);
 delay(500);
 }
 void loop(){  
@@ -51,6 +50,7 @@ void loop(){
 char plant_id='';
 if(myserial.available()){
  plant_id=myserial.read();
+ int count=3;
 }
 //_______________________to plant one__________________________________________________________________________
 if(plant_id =='1'){ 
@@ -68,6 +68,16 @@ else if((digitalRead(R_S) == 1)&&(digitalRead(L_S) == 0)){turnRight();}
 else if((digitalRead(R_S) == 0)&&(digitalRead(L_S) == 1)){turnLeft();} 
 //IF T joint arises
 else if((digitalRead(R_S) == 1)&&(digitalRead(L_S) == 1)){turnLeft();} 
+ //if t joint arises
+ else if((digitalRead(R_S) == 1)&&(digitalRead(L_S) == 1) && count==3){turnLeft();count=2;} 
+ //IF T joint arises
+else if((digitalRead(R_S) == 1)&&(digitalRead(L_S) == 1) && count==2){turnRight();turnRight();count=2;} 
+ //IF T joint arises
+else if((digitalRead(R_S) == 1)&&(digitalRead(L_S) == 1) && count==1){turnRight();count=0;} 
+ //IF T joint arises
+else if((digitalRead(R_S) == 1)&&(digitalRead(L_S) == 1) && count==0){stop();} 
+    
+delay(10);
     
 delay(10);
 }
@@ -84,10 +94,20 @@ Serial.print("D F=");Serial.println(distance_F);
 //if Right Sensor is Black and Left Sensor is White then it will call turn Right function
 else if((digitalRead(R_S) == 1)&&(digitalRead(L_S) == 0)){turnRight();}  
 //if Right Sensor is White and Left Sensor is Black then it will call turn Left function
-else if((digitalRead(R_S) == 0)&&(digitalRead(L_S) == 1)){turnLeft();}  
+else if((digitalRead(R_S) == 0)&&(digitalRead(L_S) == 1)){turnLeft();}
+ //if t joint
+else if((digitalRead(R_S) == 1)&&(digitalRead(L_S) == 1) && count==3){Forward();count=2;} 
+ //IF T joint arises
+else if((digitalRead(R_S) == 1)&&(digitalRead(L_S) == 1) && count==2){turnRight();turnRight();count=2;} 
+ //IF T joint arises
+else if((digitalRead(R_S) == 1)&&(digitalRead(L_S) == 1) && count==1){Forward();count=0;} 
+ //IF T joint arises
+else if((digitalRead(R_S) == 1)&&(digitalRead(L_S) == 1) && count==0){stop();} 
     
 delay(10);
-}
+    
+delay(10);
+}}
 //_______________________to plant three__________________________________________________________________________
 if(plant_id =='3'){ 
 distance_F = Ultrasonic_read();
@@ -103,17 +123,16 @@ else if((digitalRead(R_S) == 1)&&(digitalRead(L_S) == 0)){turnRight();}
 //if Right Sensor is White and Left Sensor is Black then it will call turn Left function
 else if((digitalRead(R_S) == 0)&&(digitalRead(L_S) == 1)){turnLeft();} 
 //IF T joint arises
-else if((digitalRead(R_S) == 1)&&(digitalRead(L_S) == 1)){turnRight();} 
+else if((digitalRead(R_S) == 1)&&(digitalRead(L_S) == 1) && count==3){turnRight();count=2;} 
+ //IF T joint arises
+else if((digitalRead(R_S) == 1)&&(digitalRead(L_S) == 1) && count==2){turnRight();turnRight();count=2;} 
+ //IF T joint arises
+else if((digitalRead(R_S) == 1)&&(digitalRead(L_S) == 1) && count==1){turnLeft();count=0;} 
+ //IF T joint arises
+else if((digitalRead(R_S) == 1)&&(digitalRead(L_S) == 1) && count==0){stop();} 
     
 delay(10);
 }}
-void servoPulse (int pin, int angle){
-int pwm = (angle*11) + 500;      // Convert angle to microseconds
- digitalWrite(pin, HIGH);
- delayMicroseconds(pwm);
- digitalWrite(pin, LOW);
- delay(50); // Refresh cycle of servo
-}
 //**********************Ultrasonic_read****************************
 long Ultrasonic_read(){
   digitalWrite(trigger, LOW);
@@ -152,20 +171,17 @@ void compareDistance(){
 void Check_side(){
     Stop();
     delay(100);
- for (int angle = 70; angle <= 140; angle += 5)  {
-   servoPulse(servo, angle);  }
-    delay(300);
+ myservo.write(30)
+  delay(500)
     distance_R = Ultrasonic_read();
     Serial.print("D R=");Serial.println(distance_R);
     delay(100);
-  for (int angle = 140; angle >= 0; angle -= 5)  {
-   servoPulse(servo, angle);  }
+  myservo.write(150);
     delay(500);
     distance_L = Ultrasonic_read();
     Serial.print("D L=");Serial.println(distance_L);
     delay(100);
- for (int angle = 0; angle <= 70; angle += 5)  {
-   servoPulse(servo, angle);  }
+  myservo.write(90);
     delay(300);
     compareDistance();
 }
