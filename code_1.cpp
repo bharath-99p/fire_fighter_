@@ -26,7 +26,7 @@ int Flame_detected;
 int buzzer = D2;
 int smokeA0 = A0;
 int sensorThres = 600;
-int led=D1
+int led=D1;
 
 
 /** MQTT Client Initialisation Using WiFi Connection ***/
