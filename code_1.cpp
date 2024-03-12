@@ -7,6 +7,8 @@
 #include <PubSubClient.h>
 #include <WiFiClientSecure.h>
 
+
+
 /** WiFi Connection Details ***/
 const char* ssid = "mm849";
 const char* password = "12345678";
@@ -21,6 +23,10 @@ WiFiClientSecure espClient;
 /**Flame_sensor initialization**/
 int Flame_sensor = 13;
 int Flame_detected;
+int buzzer = D2;
+int smokeA0 = A0;
+int sensorThres = 600;
+
 
 /** MQTT Client Initialisation Using WiFi Connection ***/
 PubSubClient client(espClient);
@@ -138,6 +144,8 @@ void setup() {
   client.setServer(mqtt_server, mqtt_port);
   //client.setCallback(callback);
   pinMode(Flame_sensor, INPUT_PULLUP);
+ pinMode(buzzer, OUTPUT);
+ pinMode(smokeA0, INPUT);
 }
 /*** Main Function ******/
 void loop() {
@@ -150,4 +158,18 @@ void loop() {
       }
 
   delay(5000);
+ int analogSensor = analogRead(smokeA0);
+
+ Serial.print("Pin A0: ");
+ Serial.println(analogSensor);
+ // Checks if it has reached the threshold value
+ if (analogSensor > sensorThres)
+ {
+   tone(buzzer, 1000, 200);
+ }
+ else
+ {
+   noTone(buzzer);
+ }
+ delay(100);
 }
