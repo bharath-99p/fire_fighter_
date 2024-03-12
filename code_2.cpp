@@ -6,6 +6,8 @@
 #include <ArduinoJson.h>
 #include <PubSubClient.h>
 #include <WiFiClientSecure.h>
+#define RXp2 16
+#define TXp2 17
 
 //#include "SoftwareSerial.h"
 
@@ -105,7 +107,13 @@ void callback(char* topic, byte* payload, unsigned int length) {
   for (int i = 0; i < length; i++) incommingMessage+=(char)payload[i];
   
   if(incommingMessage=="plant_1"){
-   Serial.write(1);
+   Serial2.write("A");
+  }
+  if(incommingMessage=="plant_2"){
+   Serial2.write("B");
+  }
+  if(incommingMessage=="plant_3"){
+   Serial2.write("C");
   }
 }
 /** Method for Publishing MQTT Messages 
@@ -118,6 +126,7 @@ void publishMessage(const char* topic, String payload , boolean retained){
 void setup() {
  
   Serial.begin(9600);
+  Serial2.begin(9600, SERIAL_8N1, RXp2, TXp2);
   //mySerial.begin(9600);
   while (!Serial) delay(1);
   setup_wifi();
