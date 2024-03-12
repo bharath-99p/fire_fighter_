@@ -16,6 +16,7 @@
 // Set up a new SoftwareSerial object
 SoftwareSerial myserial (rxPin, txPin);
 myservo.attach(11);
+int count=3;
 
 int Set=15;
 int distance_L, distance_F, distance_R; 
@@ -50,7 +51,7 @@ void loop(){
 char plant_id='';
 if(myserial.available()){
  plant_id=myserial.read();
- int count=3;
+ 
 }
 //_______________________to plant one__________________________________________________________________________
 if(plant_id =='1'){ 
@@ -71,7 +72,7 @@ else if((digitalRead(R_S) == 1)&&(digitalRead(L_S) == 1)){turnLeft();}
  //if t joint arises
  else if((digitalRead(R_S) == 1)&&(digitalRead(L_S) == 1) && count==3){turnLeft();count=2;} 
  //IF T joint arises
-else if((digitalRead(R_S) == 1)&&(digitalRead(L_S) == 1) && count==2){turnRight();turnRight();count=2;} 
+else if((digitalRead(R_S) == 1)&&(digitalRead(L_S) == 1) && count==2){turnRight();turnRight();count=1;} 
  //IF T joint arises
 else if((digitalRead(R_S) == 1)&&(digitalRead(L_S) == 1) && count==1){turnRight();count=0;} 
  //IF T joint arises
@@ -96,11 +97,11 @@ else if((digitalRead(R_S) == 1)&&(digitalRead(L_S) == 0)){turnRight();}
 //if Right Sensor is White and Left Sensor is Black then it will call turn Left function
 else if((digitalRead(R_S) == 0)&&(digitalRead(L_S) == 1)){turnLeft();}
  //if t joint
-else if((digitalRead(R_S) == 1)&&(digitalRead(L_S) == 1) && count==3){Forward();count=2;} 
+else if((digitalRead(R_S) == 1)&&(digitalRead(L_S) == 1) && count==3){forward();count=2;} 
  //IF T joint arises
-else if((digitalRead(R_S) == 1)&&(digitalRead(L_S) == 1) && count==2){turnRight();turnRight();count=2;} 
+else if((digitalRead(R_S) == 1)&&(digitalRead(L_S) == 1) && count==2){turnRight();turnRight();count=1;} 
  //IF T joint arises
-else if((digitalRead(R_S) == 1)&&(digitalRead(L_S) == 1) && count==1){Forward();count=0;} 
+else if((digitalRead(R_S) == 1)&&(digitalRead(L_S) == 1) && count==1){forward();count=0;} 
  //IF T joint arises
 else if((digitalRead(R_S) == 1)&&(digitalRead(L_S) == 1) && count==0){stop();} 
     
@@ -125,7 +126,7 @@ else if((digitalRead(R_S) == 0)&&(digitalRead(L_S) == 1)){turnLeft();}
 //IF T joint arises
 else if((digitalRead(R_S) == 1)&&(digitalRead(L_S) == 1) && count==3){turnRight();count=2;} 
  //IF T joint arises
-else if((digitalRead(R_S) == 1)&&(digitalRead(L_S) == 1) && count==2){turnRight();turnRight();count=2;} 
+else if((digitalRead(R_S) == 1)&&(digitalRead(L_S) == 1) && count==2){turnRight();turnRight();count=1;} 
  //IF T joint arises
 else if((digitalRead(R_S) == 1)&&(digitalRead(L_S) == 1) && count==1){turnLeft();count=0;} 
  //IF T joint arises
