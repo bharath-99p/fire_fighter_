@@ -18,7 +18,7 @@
 #define R_S 19 //ir sensor Right
 #define echo 22    //Echo pin
 #define trigger 23 //Trigger pin
-#define ser_pin 5  //Servo motor signal pin
+#define ser_Pin 5  //Servo motor signal pin
 //_____________________________________________________________________________________________________________________________________pwm_setup________
 const int dutyCycle = 0;    // ESP32 has 16 channels which can generate 16 independent waveforms
 const int PWM_FREQ = 5000;     // Recall that Arduino Uno is ~490 Hz. Official ESP32 example uses 5,000Hz
@@ -27,7 +27,7 @@ const int MAX_DUTY_CYCLE = (int)(pow(2, PWM_RESOLUTION) - 1);// The max duty cyc
 //______________________________________________________________________________________________________________________________________servo_setup_______
 Servo myservo;
 
-//int count=3;
+int count=3;
 
 int Set=15;
 int distance_L, distance_F, distance_R;
@@ -126,10 +126,11 @@ void reconnect() {
 /** Call back Method for Receiving MQTT messages ***/
 
 void callback(char* topic, byte* payload, unsigned int length) {
-  
-  for (int i = 0; i < length; i++) incommingMessage+=(char)payload[i];
-  Serial.println("Message arrived ["+String(topic)+"]"+incommingMessage);
-  
+  String icm="";
+  for (int i = 0; i < length; i++) icm+=(char)payload[i];
+  Serial.println("Message arrived ["+String(topic)+"]"+icm);
+  incommingMessage=icm;
+  Serial.println(incommingMessage);
 }
 /** Method for Publishing MQTT Messages ****/
 /*void publishMessage(const char* topic, String payload , boolean retained){
@@ -150,7 +151,7 @@ void setup() {
   pinMode(in4, OUTPUT); // declare as output for L298 Pin in4 
   pinMode(enB, OUTPUT); // declare as output for L298 Pin enB 
   myservo.setPeriodHertz(50);// Standard 50hz servo
-  myservo.attach(servoPin, 500, 2400);   // attaches the servo on pin 18 to the servo object
+  myservo.attach(ser_Pin, 500, 2400);   // attaches the servo on pin 18 to the servo object
   
   // _________________________________________________________________________________________________________________________________Configure PWM channel
   ledcSetup(0, 5000, 8);// channel 0, 5000 Hz, 8-bit resolutio
@@ -179,7 +180,7 @@ void loop() {
   if (!client.connected()) reconnect(); // check if client is connected
   client.loop();
  //___________________________________________________________________________________________________________________________________rover_start______________________
- if(incommingMessage=="plant_one"){
+ while(1){
      distance_F = Ultrasonic_read();
 Serial.print("D F=");Serial.println(distance_F);
 //if Right Sensor and Left Sensor are at White color then it will call forword function
@@ -208,8 +209,8 @@ delay(10);
 delay(10);
 }
   
- }
 }
+
 //**********************Ultrasonic_read****************************
 long Ultrasonic_read(){
   digitalWrite(trigger, LOW);
