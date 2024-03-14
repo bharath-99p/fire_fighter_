@@ -149,6 +149,8 @@ void setup() {
   pinMode(in3, OUTPUT); // declare as output for L298 Pin in3   
   pinMode(in4, OUTPUT); // declare as output for L298 Pin in4 
   pinMode(enB, OUTPUT); // declare as output for L298 Pin enB 
+  myservo.setPeriodHertz(50);// Standard 50hz servo
+  myservo.attach(servoPin, 500, 2400);   // attaches the servo on pin 18 to the servo object
   
   // _________________________________________________________________________________________________________________________________Configure PWM channel
   ledcSetup(0, 5000, 8);// channel 0, 5000 Hz, 8-bit resolutio
