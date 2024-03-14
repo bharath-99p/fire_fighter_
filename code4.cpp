@@ -200,13 +200,13 @@ else if((R__S == 0)&&(L__S == 1)){turnLeft();}
 //IF T joint arises
 else if((R__S == 1)&&(L__S== 1)){turnLeft();} 
  //if t joint arises
- else if((R__S == 1)&&(L__S == 1) && count==3)){turnLeft();count=2;} 
+ else if((R__S == 1)&&(L__S == 1) && count==3){turnLeft();count=2;} 
  //IF T joint arises
-else if((R__S == 1)&&(L__S == 1) && count==2)){turnRight();turnRight();count=1;} 
+else if((R__S == 1)&&(L__S == 1) && count==2){turnRight();turnRight();count=1;} 
  //IF T joint arises
-else if((R__S == 1)&&(L__S == 1) && count==1)){turnRight();count=0;} 
+else if((R__S == 1)&&(L__S == 1) && count==1){turnRight();count=0;} 
  //IF T joint arises
-else if((R__S == 1)&&(L__S == 1) && count==0)){stop();} 
+else if((R__S == 1)&&(L__S == 1) && count==0){stop();} 
     
 delay(10);
     
