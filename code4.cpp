@@ -6,19 +6,25 @@
 #include <ArduinoJson.h>
 #include <PubSubClient.h>
 #include <WiFiClientSecure.h>
-#define enA 11//Enable1 L298 Pin enA 
-#define in1 9 //Motor1  L298 Pin in1 
-#define in2 8 //Motor1  L298 Pin in1 
-#define in3 7 //Motor2  L298 Pin in1 
-#define in4 6 //Motor2  L298 Pin in1 
-#define enB 5 //Enable2 L298 Pin enB 
-#define L_S A0 //ir sensor Left
-#define R_S A1 //ir sensor Right
-#define echo A2    //Echo pin
-#define trigger A3 //Trigger pin
-#define ser_pin 10
 #include <ESP32Servo.h>
-
+//___________________________________________________________________________________________________________________________________pin_setup_______________
+#define enA 13//Enable1 L298 Pin enA 
+#define in1 12//Motor1  L298 Pin in1 
+#define in2  14 //Motor1  L298 Pin in1 
+#define in3 27 //Motor2  L298 Pin in1 
+#define in4 26 //Motor2  L298 Pin in1 
+#define enB 25 //Enable2 L298 Pin enB 
+#define L_S 18 //ir sensor Left
+#define R_S 19 //ir sensor Right
+#define echo 22    //Echo pin
+#define trigger 23 //Trigger pin
+#define ser_pin 5  //Servo motor signal pin
+//_____________________________________________________________________________________________________________________________________pwm_setup________
+const int dutyCycle = 0;    // ESP32 has 16 channels which can generate 16 independent waveforms
+const int PWM_FREQ = 5000;     // Recall that Arduino Uno is ~490 Hz. Official ESP32 example uses 5,000Hz
+const int PWM_RESOLUTION = 8; // We'll use same resolution as Uno (8 bits, 0-255) but ESP32 can go up to 16 bits 
+const int MAX_DUTY_CYCLE = (int)(pow(2, PWM_RESOLUTION) - 1);// The max duty cycle value based on PWM resolution (will be 255 if resolution is 8 bits) 
+//______________________________________________________________________________________________________________________________________servo_setup_______
 Servo myservo;
 
 //int count=3;
@@ -26,11 +32,11 @@ Servo myservo;
 int Set=15;
 int distance_L, distance_F, distance_R;
 String incommingMessage = "";
-/** WiFi Connection Details ***/
+//______________________________________________________________________________________________________________________ WiFi Connection Details
 const char* ssid = "mm849";
 const char* password = "12345678";
 
-/*** MQTT Broker Connection Details ***/
+//_______________________________________________________________________________________________________________________MQTT Broker Connection Details ***/
 const char* mqtt_server = "a77318ae28a342eeba9cfb75dd56927d.s2.eu.hivemq.cloud";
 const char* mqtt_username = "maha_002";
 const char* mqtt_password = "1212@Ap07";
@@ -85,7 +91,6 @@ void setup_wifi() {
   delay(10);
   Serial.print("\nConnecting to ");
   Serial.println(ssid);
-
   WiFi.mode(WIFI_STA);
   WiFi.begin(ssid, password);
 
@@ -118,7 +123,7 @@ void reconnect() {
     }
   }
 }
-/** Call back Method for Receiving MQTT messages and Switching LED ***/
+/** Call back Method for Receiving MQTT messages ***/
 
 void callback(char* topic, byte* payload, unsigned int length) {
   
@@ -133,19 +138,35 @@ void callback(char* topic, byte* payload, unsigned int length) {
 }*/
 /** Application Initialisation Function****/
 void setup() {
-
-  //dht.setup(DHTpin, DHTesp::DHT11); //Set up DHT11 sensor
-  pinMode(led, OUTPUT); //set up LED
+ //______________________________________________________________________________________________________________________________configure I/O pins
+  pinMode(trigger, OUTPUT); // Sets the trigPin as an Output
+  pinMode(echo, INPUT); // Sets the echoPin as an Input
+  pinMode(L_S, INPUT); // Sets the left_IR_sensor Pin as an Input
+  pinMode(R_S, INPUT); // Sets the right_IR_sensor Pin as an Input
+  pinMode(enA, OUTPUT); // declare as output for L298 Pin enA 
+  pinMode(in1, OUTPUT); // declare as output for L298 Pin in1 
+  pinMode(in2, OUTPUT); // declare as output for L298 Pin in2 
+  pinMode(in3, OUTPUT); // declare as output for L298 Pin in3   
+  pinMode(in4, OUTPUT); // declare as output for L298 Pin in4 
+  pinMode(enB, OUTPUT); // declare as output for L298 Pin enB 
+  
+  // _________________________________________________________________________________________________________________________________Configure PWM channel
+  ledcSetup(0, 5000, 8);// channel 0, 5000 Hz, 8-bit resolutio
+  ledcSetup(1, 5000, 8);// channel 1, 5000 Hz, 8-bit resolution
+  ledcAttachPin(enA, 0);  // Attach the channel to the GPIO to be controlled
+  ledcAttachPin(enB, 1);  // Attach the channel to the GPIO to be controlled
+  ledcWrite(0, dutyCycle);//setting speed of motor
+  ledcWrite(1, dutyCycle);//setting speed of moto
+  //____________________________________________________________________________________________________________________________________wi_fi_connection attempt
   Serial.begin(115200);
   while (!Serial) delay(1);
   setup_wifi();
-
   #ifdef ESP8266
     espClient.setInsecure();
   #else
     espClient.setCACert(root_ca);      // enable this line and the the "certificate" code for secure connection
   #endif
-
+  //___________________________________________________________________________________________________________________________________mqtt_broker_connection attempt
   client.setServer(mqtt_server, mqtt_port);
   client.setCallback(callback);
   client.subscribe("flame_data");
@@ -155,8 +176,35 @@ void loop() {
 
   if (!client.connected()) reconnect(); // check if client is connected
   client.loop();
+ //___________________________________________________________________________________________________________________________________rover_start______________________
  if(incommingMessage=="plant_one"){
-
+     distance_F = Ultrasonic_read();
+Serial.print("D F=");Serial.println(distance_F);
+//if Right Sensor and Left Sensor are at White color then it will call forword function
+ if((digitalRead(R_S) == 0)&&(digitalRead(L_S) == 0)){
+  if(distance_F > Set){forword();}
+                  else{Check_side();}  
+ }  
+ 
+//if Right Sensor is Black and Left Sensor is White then it will call turn Right function
+else if((digitalRead(R_S) == 1)&&(digitalRead(L_S) == 0)){turnRight();}  
+//if Right Sensor is White and Left Sensor is Black then it will call turn Left function
+else if((digitalRead(R_S) == 0)&&(digitalRead(L_S) == 1)){turnLeft();} 
+//IF T joint arises
+else if((digitalRead(R_S) == 1)&&(digitalRead(L_S) == 1)){turnLeft();} 
+ //if t joint arises
+ else if((digitalRead(R_S) == 1)&&(digitalRead(L_S) == 1) && count==3){turnLeft();count=2;} 
+ //IF T joint arises
+else if((digitalRead(R_S) == 1)&&(digitalRead(L_S) == 1) && count==2){turnRight();turnRight();count=1;} 
+ //IF T joint arises
+else if((digitalRead(R_S) == 1)&&(digitalRead(L_S) == 1) && count==1){turnRight();count=0;} 
+ //IF T joint arises
+else if((digitalRead(R_S) == 1)&&(digitalRead(L_S) == 1) && count==0){stop();} 
+    
+delay(10);
+    
+delay(10);
+}
   
  }
 }
