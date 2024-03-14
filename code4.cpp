@@ -30,7 +30,7 @@ Servo myservo;
 int count=3;
 
 int Set=15;
-int distance_L, distance_F, distance_R;
+int distance_L, distance_F, distance_R,L__S,R__S;
 String incommingMessage = "";
 //______________________________________________________________________________________________________________________ WiFi Connection Details
 const char* ssid = "mm849";
@@ -179,30 +179,34 @@ void loop() {
 
   if (!client.connected()) reconnect(); // check if client is connected
   client.loop();
+ 
+ 
  //___________________________________________________________________________________________________________________________________rover_start______________________
  while(1){
+  L__S=digitalRead(L_S);
+   R__S =digitalRead(R_S);
      distance_F = Ultrasonic_read();
 Serial.print("D F=");Serial.println(distance_F);
 //if Right Sensor and Left Sensor are at White color then it will call forword function
- if((digitalRead(R_S) == 0)&&(digitalRead(L_S) == 0)){
+ if((R__S == 0 )&& (L__S == 0)){
   if(distance_F > Set){forword();}
                   else{Check_side();}  
  }  
  
 //if Right Sensor is Black and Left Sensor is White then it will call turn Right function
-else if((digitalRead(R_S) == 1)&&(digitalRead(L_S) == 0)){turnRight();}  
+else if((R__S == 1)&&(L__S== 0)){turnRight();}  
 //if Right Sensor is White and Left Sensor is Black then it will call turn Left function
-else if((digitalRead(R_S) == 0)&&(digitalRead(L_S) == 1)){turnLeft();} 
+else if((R__S == 0)&&(L__S == 1)){turnLeft();} 
 //IF T joint arises
-else if((digitalRead(R_S) == 1)&&(digitalRead(L_S) == 1)){turnLeft();} 
+else if((R__S == 1)&&(L__S== 1)){turnLeft();} 
  //if t joint arises
- else if((digitalRead(R_S) == 1)&&(digitalRead(L_S) == 1) && count==3){turnLeft();count=2;} 
+ else if((R__S == 1)&&(L__S == 1) && count==3)){turnLeft();count=2;} 
  //IF T joint arises
-else if((digitalRead(R_S) == 1)&&(digitalRead(L_S) == 1) && count==2){turnRight();turnRight();count=1;} 
+else if((R__S == 1)&&(L__S == 1) && count==2)){turnRight();turnRight();count=1;} 
  //IF T joint arises
-else if((digitalRead(R_S) == 1)&&(digitalRead(L_S) == 1) && count==1){turnRight();count=0;} 
+else if((R__S == 1)&&(L__S == 1) && count==1)){turnRight();count=0;} 
  //IF T joint arises
-else if((digitalRead(R_S) == 1)&&(digitalRead(L_S) == 1) && count==0){stop();} 
+else if((R__S == 1)&&(L__S == 1) && count==0)){stop();} 
     
 delay(10);
     
