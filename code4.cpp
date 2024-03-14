@@ -6,6 +6,26 @@
 #include <ArduinoJson.h>
 #include <PubSubClient.h>
 #include <WiFiClientSecure.h>
+#define enA 11//Enable1 L298 Pin enA 
+#define in1 9 //Motor1  L298 Pin in1 
+#define in2 8 //Motor1  L298 Pin in1 
+#define in3 7 //Motor2  L298 Pin in1 
+#define in4 6 //Motor2  L298 Pin in1 
+#define enB 5 //Enable2 L298 Pin enB 
+#define L_S A0 //ir sensor Left
+#define R_S A1 //ir sensor Right
+#define echo A2    //Echo pin
+#define trigger A3 //Trigger pin
+#define ser_pin 10
+#include <ESP32Servo.h>
+
+Servo myservo;
+
+//int count=3;
+
+int Set=15;
+int distance_L, distance_F, distance_R;
+String incommingMessage = "";
 /** WiFi Connection Details ***/
 const char* ssid = "mm849";
 const char* password = "12345678";
@@ -101,24 +121,16 @@ void reconnect() {
 /** Call back Method for Receiving MQTT messages and Switching LED ***/
 
 void callback(char* topic, byte* payload, unsigned int length) {
-  String incommingMessage = "";
+  
   for (int i = 0; i < length; i++) incommingMessage+=(char)payload[i];
   Serial.println("Message arrived ["+String(topic)+"]"+incommingMessage);
-  if(incommingMessage=="plant_one"){
-    Serial.write("one");
-  }
-  if(incommingMessage=="plant_two"){
-    Serial.write("two");
-  }
-  if(incommingMessage=="plant_three"){
-    Serial.write("three");
-  }
+  
 }
 /** Method for Publishing MQTT Messages ****/
-void publishMessage(const char* topic, String payload , boolean retained){
+/*void publishMessage(const char* topic, String payload , boolean retained){
   if (client.publish(topic, payload.c_str(), true))
       Serial.println("Message publised ["+String(topic)+"]: "+payload);
-}
+}*/
 /** Application Initialisation Function****/
 void setup() {
 
@@ -143,4 +155,90 @@ void loop() {
 
   if (!client.connected()) reconnect(); // check if client is connected
   client.loop();
+ if(incommingMessage=="plant_one"){
+
+  
+ }
+}
+//**********************Ultrasonic_read****************************
+long Ultrasonic_read(){
+  digitalWrite(trigger, LOW);
+  delayMicroseconds(2);
+  digitalWrite(trigger, HIGH);
+  delayMicroseconds(10);
+  long time = pulseIn (echo, HIGH);
+  return time / 29 / 2;
+}
+void compareDistance(){
+    if(distance_L > distance_R){
+  turnLeft();
+  delay(500);
+  forword();
+  delay(600);
+  turnRight();
+  delay(500);
+  forword();
+  delay(600);
+  turnRight();
+  delay(400);
+  }
+  else{
+  turnRight();
+  delay(500);
+  forword();
+  delay(600);
+  turnLeft();
+  delay(500);
+  forword();
+  delay(600);  
+  turnLeft();
+  delay(400);
+  }
+}
+void Check_side(){
+    stop();
+    delay(100);
+ myservo.write(30);
+  delay(500);
+    distance_R = Ultrasonic_read();
+    Serial.print("D R=");Serial.println(distance_R);
+    delay(100);
+  myservo.write(150);
+    delay(500);
+    distance_L = Ultrasonic_read();
+    Serial.print("D L=");Serial.println(distance_L);
+    delay(100);
+  myservo.write(90);
+    delay(300);
+    compareDistance();
+}
+void forword(){  //forword
+digitalWrite(in1, LOW); //Left Motor backword Pin 
+digitalWrite(in2, HIGH); //Left Motor forword Pin 
+digitalWrite(in3, HIGH); //Right Motor forword Pin 
+digitalWrite(in4, LOW); //Right Motor backword Pin 
+}
+void backword(){ //backword
+digitalWrite(in1, HIGH); //Left Motor backword Pin 
+digitalWrite(in2, LOW); //Left Motor forword Pin 
+digitalWrite(in3, LOW); //Right Motor forword Pin 
+digitalWrite(in4, HIGH); //Right Motor backword Pin 
+}
+void turnRight(){ //turnRight
+digitalWrite(in1, LOW); //Left Motor backword Pin 
+digitalWrite(in2, HIGH); //Left Motor forword Pin 
+digitalWrite(in3, LOW); //Right Motor forword Pin 
+digitalWrite(in4, HIGH); //Right Motor backword Pin 
+}
+void turnLeft(){ //turnLeft
+digitalWrite(in1, HIGH); //Left Motor backword Pin 
+digitalWrite(in2, LOW); //Left Motor forword Pin 
+digitalWrite(in3, HIGH); //Right Motor forword Pin 
+analogWrite(in4, LOW); //Right Motor backword Pin 
+}
+void stop(){ //stop
+digitalWrite(in1, LOW); //Left Motor backword Pin 
+digitalWrite(in2, LOW); //Left Motor forword Pin 
+digitalWrite(in3, LOW); //Right Motor forword Pin 
+digitalWrite(in4, LOW); //Right Motor backword Pin 
 }
